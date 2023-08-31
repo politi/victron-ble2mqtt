@@ -1,0 +1,39 @@
+## Add your devices here:
+#devices:
+#    - name: Shunt1
+#      type: smartshunt
+#      protocol: bluetooth-ble
+#      mac: fd:d4:50:0f:6c:1b
+#    - name: Solar1
+#      type: smartsolar
+#      protocol: bluetooth
+#      mac: F9:8E:1C:EC:9C:72
+#    - name: Phoenix1
+#      type: pheonix
+#      protocol: serial
+#      port: /dev/ttyUSB0
+
+devices:
+    - name: HQ123456NKZ
+      type: smartsolar
+      protocol: bluetooth
+      mac: AF:CA:17:59:7D:D5
+      encryptionKey: 1234567890abcdefb539e4140567b361
+
+
+## MQTT server
+## Mandatory:
+##   host: IP or Hostname
+##   port: 1883
+##   base_topic: victron
+## Optional:
+##   username: MQTT_USER
+##   password: PASSWORD
+mqtt:
+    #host: 127.0.0.1
+    host: dataserverip.it
+    port: 1883
+    base_topic: victron
+    hass: False
+    username: MQTT_USERNAME
+    password: MQTT_PASSWORD

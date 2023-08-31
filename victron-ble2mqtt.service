@@ -1,0 +1,15 @@
+[Unit]
+Description=Get solar data from victron smart solar and send it to MQTT
+After=bluetooth.service mosquitto.service
+
+[Service]
+WorkingDirectory=/opt/victron-ble2mqtt
+ExecStart=python3 /opt/victron-ble2mqtt/victron-ble2mqtt.py -d 0 --quiet
+Type=simple
+User=pi
+Restart=always
+RestartSec=5
+StartLimitBurst=10
+
+[Install]
+WantedBy=multi-user.target
