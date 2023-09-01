@@ -173,13 +173,18 @@ Depending on you needs you can also (alternatively) configure it running at boot
 crontab -e
 ```
 
-Add/uncomment the following lines in the crontab 
+Add/edit/comment/uncomment the following lines in the crontab as needed
 
 ```crontab
 #*/5 * * * * /opt/victron-ble2mqtt/victron-ble2mqtt.sh  # Run every 5 minutes
 
 # run at boot with a 10 second delay (Witty Pi is used to power OFF/ON periodically to reduce power consumption)
 #@reboot sleep 10 && /opt/victron-ble2mqtt/victron-ble2mqtt.sh
+
+# run every day at 20:20 and 20:40 (when the maintainance ON time window is active and the Pi is not rebooting every 20 minutes)
+20 20 * * *  /opt/victron-ble2mqtt/victron-ble2mqtt.sh
+20 40 * * *  /opt/victron-ble2mqtt/victron-ble2mqtt.sh
+
 ```
 
 

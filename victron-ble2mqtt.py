@@ -28,6 +28,8 @@ from victron_ble.scanner import DebugScanner, DiscoveryScanner, Scanner, BaseSca
 
 version = 0.1
 
+MAX_MQTT_PUBLISH_ATTEMPTS = 5
+
 
 def victron_thread(thread_count, config, vdevice_config, thread_q):
     from lib.victron import Victron
@@ -77,8 +79,15 @@ def output_syslog(device_name, category, value, hass_config=False, vunit=None):
 
 
 def mqtt_onconnect(client, userdata, flags, rc):
-    lient.publish(mqtt_lwt, payload=1, qos=0, retain=True)
+    #client.publish(mqtt_lwt, payload=1, qos=0, retain=True)
+    if args.debug: 
+        if rc == 0:
+            logger.debug("Connected to MQTT Broker!")
+        else:
+            logger.debug("Failed to connect to MQTT Broker. Return code: %d\n", rc)
 
+def mqtt_onlog(client, userdata, level, buf):
+    logger.debug("mqtt log: ",buf)
 
 def mqtt_pub(device_type, device_name, value):
     global client
@@ -86,13 +95,29 @@ def mqtt_pub(device_type, device_name, value):
     retain = False
 
     if not value == "":
-        pub = f'{config["mqtt"]["base_topic"]}/{device_type}/{device_name}'
+        topic = f'{config["mqtt"]["base_topic"]}/{device_type}/{device_name}'
         if type(value) is dict:
             data = json.dumps(value)
         else:
             data = value
-
-    client.publish(pub, data, retain=retain)
+    pub_success = False
+    pub_attempts = 0
+    while True:
+        result = client.publish(topic, data, retain=retain)
+        # result: [0, 1]
+        status = result[0]
+        if status == 0:
+            #print(f"Send `{msg}` to topic `{topic}`")
+            logger.debug(f"Data published to topic `{topic}`.")
+            pub_success = True
+        else:
+            #print(f"Failed to send message to topic {topic}")
+            logger.warning(f"Failed to send message to topic {topic}")
+            pub_attempts += 1
+        if pub_attempts > MAX_MQTT_PUBLISH_ATTEMPTS or pub_success:
+            break
+    time.sleep(4) # wait
+    client.loop_stop() #stop the loop
 
 
 def get_helper_string_device(devices):
@@ -124,7 +149,7 @@ def DataParser(data, encryptionKey):
 		"external_device_load": parsed_data.get_external_device_load()
 	}
 	
-	print("Response: "+ str(response))
+	print("Victron Response: "+ str(response))
 
 	return response
 
@@ -145,6 +170,7 @@ class VictronScanner(BaseScanner):
             
 			#send to MQTT
             mqtt_pub(self.device['type'], self.device['name'], values)
+            logger.debug(f"Program terminated. Exiting")
             sys.exit(0)
 
 
@@ -250,6 +276,8 @@ if __name__ == "__main__":
         client.username_pw_set(username=config['mqtt']['username'],password=config['mqtt']['password'])
 
     client.connect(config['mqtt']['host'], config['mqtt']['port'], 60)
+    #client.on_log=mqtt_onlog
+    client.on_connect=mqtt_onconnect
     client.loop_start()
 
     q = queue.Queue()
