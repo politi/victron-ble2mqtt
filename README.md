@@ -182,9 +182,12 @@ Add/edit/comment/uncomment the following lines in the crontab as needed
 #@reboot sleep 10 && /opt/victron-ble2mqtt/victron-ble2mqtt.sh
 
 # run every day at 20:20 and 20:40 (when the maintainance ON time window is active and the Pi is not rebooting every 20 minutes)
-20 20 * * *  /opt/victron-ble2mqtt/victron-ble2mqtt.sh
-20 40 * * *  /opt/victron-ble2mqtt/victron-ble2mqtt.sh
+#20 20 * * *  /opt/victron-ble2mqtt/victron-ble2mqtt.sh
+#20 40 * * *  /opt/victron-ble2mqtt/victron-ble2mqtt.sh
 
+
+# run every 20 minutes (power scheduler will power on the Raspberry 2 minutes before execution, and turn it off 3 minute after)
+*/20 * * * *  /opt/victron-ble2mqtt/victron-ble2mqtt.sh
 ```
 
 
