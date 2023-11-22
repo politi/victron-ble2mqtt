@@ -236,3 +236,103 @@ sqlite3 ~/.local/share/Victron\ Energy/Victron\ Connect/d25b6546b47ebb21a04ff86a
 3. Open Explorer, navigate to ```%AppData%\Local\Victron Energy\Victron Connect\```
 4. Open [SQLite Viewer](https://inloop.github.io/sqlite-viewer/) in a web browser of your choice
 5. Drag and drop the ```d25b6546b47ebb21a04ff86a2c4fbb76.sqlite``` file from Explorer into the SQLite Viewer window
+
+**Android**
+
+The procedure to extract the encryprion key form an Android device is a little more complicated and requires you to enable developer options
+It does NON require you to root your device
+
+##### *<ins>Prepare the PC (Windows) - ONE TIME ONLY</ins>*
+1. Download ADB tools from [here](https://dl.google.com/android/repository/platform-tools-latest-windows.zip)
+2. Extract the arcive in a choosen directory (ex. c:\platform-tools)
+
+##### *<ins>Prepare Android Device - ONE TIME ONLY</ins>*
+1. enable developer options 
+	a. Go to *settings*  -> *device information* or *About phone* -> *software information*
+    b. Touch the Build number field 7 times. You will begin seeing a message as you approach the 7 touches.
+    c. Touch the back arrow once complete, and Developer options will now appear under Settings.
+2. Enable debug permissions
+	a. Go to *settings* -> *Developer options*
+	b. Verify that the checkbox on the top of the screen is **enabled**
+	c. Scroll down to **USB debug** option and enable it
+
+##### *<ins>Close to the Victron (on the field)</ins>*
+1. Just launche the *Victron Connect* app and connect to the victron device
+
+
+##### *<ins>Download the data from the Android device (back at the PC)</ins>*
+1. Connect the Android phone to the PC with a USB cable
+2. Open a Windows command console (start -> cmd)
+3. Go to to the <ins>platform-tools</ins> direcotry. (if the <ins>platform-tools</ins> software has been installed/extracted in a different directory, just write the right path)
+```cmd
+ cd c:\platform-tools
+```
+	
+4. Verify that the Android device is recognized:
+```cmd
+adb devices
+```
+A list of connected devices should appear (you should see only one device)
+```cmd
+C:\platform-tools>adb devices
+	List of devices attached
+	R58M63EQGSV     device
+```
+  
+**Note**: the first time you connect ADB to the device, you should see an authorization request on the device itself. 
+> Tap on **Always allow from this computer** and press **OK**
+		
+5. Type in the following command to extract the data form the Victorn Connect app
+```cmd
+adb backup -noapk com.victronenergy.victronconnect -f victron-data.adb
+```
+
+6. on the phone, you will see a screen informing that a data backup has been requested.
+> To proceed you may need to insert a password
+
+8. Type in a password (es. 12345)
+
+9. Press the button "Backup my data"
+
+10. After a few seconds, on the PC, in the directory where you have installed the Android platform-tools (i.e. c:\platform-tools) a file **victron.data.adb** will be created.
+
+
+
+##### *<ins>Decrypting the backup</ins>*
+
+The backup has been encrypted with an AES256 key.
+
+To decrypt it you can use a program called *Android Backup Extractor*.
+You can download it fromn [here](https://github.com/nelenkov/android-backup-extractor)
+
+1. Go to the project home page and download the latest availanle release (or you can compile the source code if you prefer)
+
+2. Launch the following command (you need a Java RE installed on the PC)
+```cmd
+java -jar abe.jar unpack victron-data.adb victron-data.tar <password>
+
+es.
+java -jar abe.jar unpack victron-data.adb victron-data.tar 12345
+```
+   
+3. A new file called <ins>victron-data.tar</ins> will be created
+
+4. Extract the content of the unencrypted archive
+
+5. Navigate to the actual data directory
+```cmd
+apps\com.victronenergy.victronconnect\f
+```
+
+6. Copy the <ins>.sqlite</ins> file (it has a long name that change for very device)
+```cmd
+es. 
+d25b6546b47ebb21a04ff86a2c4fbb76.sqlite
+```
+
+
+
+
+
+
+
