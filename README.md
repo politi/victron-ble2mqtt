@@ -239,8 +239,9 @@ sqlite3 ~/.local/share/Victron\ Energy/Victron\ Connect/d25b6546b47ebb21a04ff86a
 
 **Android**
 
-The procedure to extract the encryprion key form an Android device is a little more complicated and requires you to enable developer options
-It does NON require you to root your device
+The procedure to extract the encryprion key form an Android device is a little more complicated and requires you to enable developer options.
+
+It does NOT require you to root your device
 
 ##### *<ins>Prepare the PC (Windows) - ONE TIME ONLY</ins>*
 1. Download ADB tools from [here](https://dl.google.com/android/repository/platform-tools-latest-windows.zip)
